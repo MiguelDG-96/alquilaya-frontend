@@ -1,0 +1,51 @@
+/* Estilos específicos para móvil */
+@media (max-width: 640px) {
+  /* Botones de categoría estilo "Temu" (pequeños y compactos) */
+  .categories-container button {
+    min-height: 36px;
+    font-weight: 500;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  }
+  
+  /* Asegurar que los iconos sean visibles en móvil */
+  .categories-container lucide-icon {
+    flex-shrink: 0;
+  }
+  
+  /* Texto truncado en móvil */
+  .truncate {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  
+  /* Mejorar experiencia táctil */
+  button {
+    -webkit-tap-highlight-color: transparent;
+  }
+  
+  /* Asegurar que el grid se vea bien en móvil */
+  .product-card {
+    min-width: 0;
+  }
+}
+
+/* Mejorar el fade effect en móvil */
+@media (max-width: 768px) {
+  .fade-left, .fade-right {
+    opacity: 0.8;
+  }
+}
+
+/* Asegurar que el scroll horizontal funcione en móvil */
+.scroll-container {
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Estilos para hover en móvil (solo cuando no es táctil) */
+@media (hover: hover) and (pointer: fine) {
+  .categories-container button:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.15);
+  }
+}
