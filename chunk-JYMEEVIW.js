@@ -1,1 +1,0 @@
-import{Jb as a,Za as e,rb as n,sb as i}from"./chunk-QRDQZ3QX.js";var s=class o{static \u0275fac=function(t){return new(t||o)};static \u0275cmp=e({type:o,selectors:[["app-notifications"]],decls:2,vars:0,template:function(t,p){t&1&&(n(0,"p"),a(1,"notifications works!"),i())},encapsulation:2})};export{s as NotificationsComponent};
