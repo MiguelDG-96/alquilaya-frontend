@@ -1,6 +1,26 @@
-<app-dashboard-navbar></app-dashboard-navbar>
-<app-dashboard-sidebar></app-dashboard-sidebar>
+<div class="min-h-screen bg-gray-50">
+  <app-dashboard-navbar></app-dashboard-navbar>
+  <app-dashboard-sidebar></app-dashboard-sidebar>
 
-<div class="p-4 sm:ml-64 mt-14">
-  
+
+  <!-- Contenido principal -->
+  <main
+    [class]="getMainClasses()"
+    (click)="closeMobileSidebar()"
+    class="md:pl-64 pt-10"
+  >
+    <!-- Ajusta padding según sidebar width -->
+    <div class="p-2 md:p-6">
+      <!-- Aquí se renderizarán los componentes hijos -->
+      <router-outlet></router-outlet>
+    </div>
+  </main>
+
+  <!-- Overlay para móvil (solo visible cuando sidebar está abierto en móvil) -->
+  @if (isMobileOpen && isMobileView()) {
+  <div
+    class="fixed inset-0 z-30 bg-black/50 md:hidden transition-opacity duration-300"
+    (click)="sidebarService.closeMobile()"
+  ></div>
+  }
 </div>

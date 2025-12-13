@@ -6,6 +6,16 @@
       <!-- Lado Izquierdo (Branding) -->
       <div class="hidden lg:flex flex-col justify-center p-12 text-white relative overflow-hidden" 
            style="background: linear-gradient(135deg, #662380 0%, #8B4FA8 100%)">
+        
+        <!-- PATRÓN DE PUNTOS SOLO EN MÓVIL -->
+        <div class="lg:hidden absolute inset-0 z-0 opacity-20"
+             style="
+               background-image: radial-gradient(currentColor 1px, transparent 1px);
+               background-size: 20px 20px;
+               color: #a78bfa;
+             ">
+        </div>
+        
         <div class="relative z-10">
           <div class="flex items-end gap-2 mb-8">
             <figure>
@@ -14,13 +24,10 @@
           </div>
 
           <h2 class="text-3xl mb-4">
-            {{ isLogin() ? '¡Bienvenido de nuevo!' : '¡Únete a nosotros!' }}
+            ¡Únete a nosotros!
           </h2>
           <p class="text-purple-100 text-lg mb-8">
-            {{ isLogin()
-              ? 'Accede a miles de productos disponibles para alquilar'
-              : 'Comienza a alquilar o publica tus propios productos'
-            }}
+            Comienza a alquilar o publica tus propios productos
           </p>
 
           <div class="space-y-4">
@@ -43,33 +50,41 @@
       <!-- Lado Derecho (Formulario) -->
       <div class="p-8 lg:p-12 relative">
         
+        <!-- PATRÓN DE PUNTOS SOLO EN MÓVIL para el lado del formulario -->
+        <div class="lg:hidden absolute inset-0 z-0 opacity-10"
+             style="
+               background-image: radial-gradient(currentColor 1px, transparent 1px);
+               background-size: 25px 25px;
+               color: #662380;
+             ">
+        </div>
+        
         <!-- Logo Móvil -->
-        <div class="lg:hidden flex items-center justify-center gap-1.5 mb-6">
+        <div class="lg:hidden flex items-center justify-center gap-1.5 mb-6 relative z-10">
           <figure class="flex items-center justify-center">
             <img src="./assets/img/logo-alquilaYa.svg" alt="Logo Alquila Ya!" class="h-12 w-auto">
           </figure>
         </div>
 
         <!-- Título -->
-        <h3 class="text-2xl mb-2 text-gray-800">
-          {{ isLogin() ? 'Iniciar Sesión' : 'Crear Cuenta' }}
-        </h3>
-        <p class="text-gray-600 mb-6">
-          {{ isLogin()
-            ? 'Ingresa tus credenciales para continuar'
-            : 'Completa tus datos para registrarte'
-          }}
-        </p>
+        <div class="relative z-10">
+          <h3 class="text-2xl mb-2 text-gray-800">
+            Crear Cuenta
+          </h3>
+          <p class="text-gray-600 mb-6">
+            Completa tus datos para registrarte
+          </p>
+        </div>
         
         <!-- Mensaje de Error -->
         @if (errorMessage()) {
-          <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg mb-6" role="alert">
+          <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg mb-6 relative z-10" role="alert">
             <span class="block">{{ errorMessage() }}</span>
           </div>
         }
 
         <!-- Google Login -->
-        <div class="mb-6">
+        <div class="mb-6 relative z-10">
           <div id="g_id_onload"
                data-client_id="430705636704-i9t93p9j0s60135ec6pq665a8qlepeoa.apps.googleusercontent.com"
                data-callback="handleGoogleLogin"
@@ -86,7 +101,7 @@
         </div>
 
         <!-- Separador -->
-        <div class="relative mb-6">
+        <div class="relative mb-6 z-10">
           <div class="absolute inset-0 flex items-center">
             <div class="w-full border-t border-gray-300"></div>
           </div>
@@ -95,49 +110,46 @@
           </div>
         </div>
 
-        <!-- Formulario -->
-        <form [formGroup]="authForm" (ngSubmit)="onSubmit()" class="space-y-4">
+        <!-- Formulario de Registro -->
+        <form [formGroup]="registerForm" (ngSubmit)="onSubmit()" class="space-y-4 relative z-10">
           
-          <!-- Campos de Registro -->
-          @if (!isLogin()) {
-            <!-- Nombre completo -->
-            <div>
-              <label [for]="inputIds.name" class="block text-sm mb-2 text-gray-700">
-                Nombre completo
-              </label>
-              <app-input 
-                [id]="inputIds.name"
-                formControlName="registerName" 
-                type="text" 
-                placeholder="Juan Pérez" 
-                iconLeft="fas fa-user">
-              </app-input>
-              @if (authForm.get('registerName')?.touched && authForm.get('registerName')?.hasError('required')) {
-                <p class="text-xs text-red-500 mt-1">El nombre es obligatorio.</p>
-              }
-            </div>
+          <!-- Nombre completo -->
+          <div>
+            <label [for]="inputIds.name" class="block text-sm mb-2 text-gray-700">
+              Nombre completo
+            </label>
+            <app-input 
+              [id]="inputIds.name"
+              formControlName="name" 
+              type="text" 
+              placeholder="Juan Pérez" 
+              iconLeft="fas fa-user">
+            </app-input>
+            @if (registerForm.get('name')?.touched && registerForm.get('name')?.hasError('required')) {
+              <p class="text-xs text-red-500 mt-1">El nombre es obligatorio.</p>
+            }
+          </div>
 
-            <!-- Celular -->
-            <div>
-              <label [for]="inputIds.phone" class="block text-sm mb-2 text-gray-700">
-                Celular
-              </label>
-              <app-input 
-                [id]="inputIds.phone"
-                formControlName="registerPhone" 
-                type="tel" 
-                placeholder="987654321" 
-                iconLeft="fas fa-phone">
-              </app-input>
-              @if (authForm.get('registerPhone')?.touched) {
-                @if (authForm.get('registerPhone')?.hasError('required')) {
-                  <p class="text-xs text-red-500 mt-1">El celular es obligatorio.</p>
-                } @else if (authForm.get('registerPhone')?.hasError('pattern')) {
-                  <p class="text-xs text-red-500 mt-1">Ingresa un celular válido (9 dígitos).</p>
-                }
+          <!-- Celular -->
+          <div>
+            <label [for]="inputIds.phone" class="block text-sm mb-2 text-gray-700">
+              Celular
+            </label>
+            <app-input 
+              [id]="inputIds.phone"
+              formControlName="phone" 
+              type="tel" 
+              placeholder="987654321" 
+              iconLeft="fas fa-phone">
+            </app-input>
+            @if (registerForm.get('phone')?.touched) {
+              @if (registerForm.get('phone')?.hasError('required')) {
+                <p class="text-xs text-red-500 mt-1">El celular es obligatorio.</p>
+              } @else if (registerForm.get('phone')?.hasError('pattern')) {
+                <p class="text-xs text-red-500 mt-1">Ingresa un celular válido (9 dígitos).</p>
               }
-            </div>
-          }
+            }
+          </div>
 
           <!-- Email -->
           <div>
@@ -151,7 +163,7 @@
               placeholder="tu@email.com" 
               iconLeft="fas fa-envelope">
             </app-input>
-            @if (authForm.get('email')?.touched && authForm.get('email')?.invalid) {
+            @if (registerForm.get('email')?.touched && registerForm.get('email')?.invalid) {
               <p class="text-xs text-red-500 mt-1">Ingresa un correo válido.</p>
             }
           </div>
@@ -168,86 +180,62 @@
               placeholder="••••••••" 
               iconLeft="fas fa-lock">
             </app-input>
-            @if (authForm.get('password')?.touched) {
-              @if (authForm.get('password')?.hasError('required')) {
+            @if (registerForm.get('password')?.touched) {
+              @if (registerForm.get('password')?.hasError('required')) {
                 <p class="text-xs text-red-500 mt-1">La contraseña es obligatoria.</p>
-              } @else if (authForm.get('password')?.hasError('minlength')) {
+              } @else if (registerForm.get('password')?.hasError('minlength')) {
                 <p class="text-xs text-red-500 mt-1">La contraseña debe tener al menos 6 caracteres.</p>
               }
             }
           </div>
 
-          <!-- Confirmar Password (solo registro) -->
-          @if (!isLogin()) {
-            <div>
-              <label [for]="inputIds.confirmPassword" class="block text-sm mb-2 text-gray-700">
-                Confirmar contraseña
-              </label>
-              <app-input 
-                [id]="inputIds.confirmPassword"
-                formControlName="registerConfirmPassword" 
-                type="password" 
-                placeholder="••••••••" 
-                iconLeft="fas fa-lock">
-              </app-input>
-              @if (authForm.get('registerConfirmPassword')?.touched) {
-                @if (authForm.hasError('passwordsNotMatching')) {
-                  <p class="text-xs text-red-500 mt-1">Las contraseñas no coinciden.</p>
-                } @else if (authForm.get('registerConfirmPassword')?.hasError('required')) {
-                  <p class="text-xs text-red-500 mt-1">Debes confirmar la contraseña.</p>
-                }
-              }
-            </div>
-          }
-
-          <!-- Opciones -->
-          @if (isLogin()) {
-            <!-- Recordarme y Olvidé Contraseña -->
-            <div class="flex items-center justify-between">
-              <label class="flex items-center">
-                <input 
-                  [id]="inputIds.rememberMe"
-                  type="checkbox" 
-                  formControlName="rememberMe" 
-                  class="mr-2 h-4 w-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500" />
-                <span class="text-sm text-gray-600">Recordarme</span>
-              </label>
-              <button 
-                type="button" 
-                (click)="onForgotPassword()"
-                class="text-sm hover:underline font-medium" 
-                style="color: #662380">
-                ¿Olvidaste tu contraseña?
-              </button>
-            </div>
-          } @else {
-            <!-- Términos y Condiciones -->
-            <label class="flex items-start">
-              <input 
-                [id]="inputIds.acceptTerms"
-                type="checkbox" 
-                formControlName="acceptTerms" 
-                class="mt-1 mr-2 h-4 w-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500" />
-              <span class="text-sm text-gray-600">
-                Acepto los 
-                <button type="button" class="hover:underline" style="color: #662380">Términos y Condiciones</button> 
-                y la 
-                <button type="button" class="hover:underline" style="color: #662380">Política de Privacidad</button>
-              </span>
+          <!-- Confirmar Password -->
+          <div>
+            <label [for]="inputIds.confirmPassword" class="block text-sm mb-2 text-gray-700">
+              Confirmar contraseña
             </label>
-            @if (authForm.get('acceptTerms')?.touched && authForm.get('acceptTerms')?.hasError('requiredTrue')) {
-              <p class="text-xs text-red-500 mt-1">Debes aceptar los términos y condiciones.</p>
+            <app-input 
+              [id]="inputIds.confirmPassword"
+              formControlName="confirmPassword" 
+              type="password" 
+              placeholder="••••••••" 
+              iconLeft="fas fa-lock">
+            </app-input>
+            @if (registerForm.get('confirmPassword')?.touched) {
+              @if (registerForm.hasError('passwordsNotMatching')) {
+                <p class="text-xs text-red-500 mt-1">Las contraseñas no coinciden.</p>
+              } @else if (registerForm.get('confirmPassword')?.hasError('required')) {
+                <p class="text-xs text-red-500 mt-1">Debes confirmar la contraseña.</p>
+              }
             }
+          </div>
+
+          <!-- Términos y Condiciones -->
+          <label class="flex items-start">
+            <input 
+              [id]="inputIds.acceptTerms"
+              type="checkbox" 
+              formControlName="acceptTerms" 
+              class="mt-1 mr-2 h-4 w-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500" />
+            <span class="text-sm text-gray-600">
+              Acepto los 
+              <button type="button" class="hover:underline" style="color: #662380">Términos y Condiciones</button> 
+              y la 
+              <button type="button" class="hover:underline" style="color: #662380">Política de Privacidad</button>
+            </span>
+          </label>
+          @if (registerForm.get('acceptTerms')?.touched && registerForm.get('acceptTerms')?.hasError('requiredTrue')) {
+            <p class="text-xs text-red-500 mt-1">Debes aceptar los términos y condiciones.</p>
           }
 
           <!-- Botón de Envío -->
           <button
             type="submit"
-            [disabled]="authForm.invalid || loading()"
-            class="w-full py-3 rounded-lg text-white text-lg font-semibold transition-all duration-200 shadow-lg flex items-center justify-center gap-2"
+            [disabled]="registerForm.invalid || loading()"
+            class="w-full py-3 rounded-lg text-white text-lg font-semibold transition-all duration-200 shadow-lg flex items-center justify-center gap-2 relative z-10"
             [ngClass]="{
-              'bg-gray-400 cursor-not-allowed': authForm.invalid || loading(),
-              'hover:opacity-90': !authForm.invalid && !loading()
+              'bg-gray-400 cursor-not-allowed': registerForm.invalid || loading(),
+              'hover:opacity-90': !registerForm.invalid && !loading()
             }"
             style="background: #662380"
           >
@@ -255,22 +243,22 @@
               <i class="fa-solid fa-spinner fa-spin"></i>
               <span>Cargando...</span>
             } @else {
-              <span>{{ isLogin() ? 'Iniciar Sesión' : 'Crear Cuenta' }}</span>
+              <span>Crear Cuenta</span>
             }
           </button>
         </form>
 
         <!-- Footer -->
-        <div class="mt-6 text-center">
+        <div class="mt-6 text-center relative z-10">
           <span class="text-gray-600">
-            {{ isLogin() ? '¿No tienes cuenta?' : '¿Ya tienes cuenta?' }}
+            ¿Ya tienes cuenta?
           </span>
           <button
-            (click)="toggleAuthMode(!isLogin())"
+            (click)="navigateToLogin()"
             class="hover:underline font-semibold ml-1"
             style="color: #662380"
           >
-            {{ isLogin() ? 'Regístrate' : 'Inicia sesión' }}
+            Inicia sesión
           </button>
         </div>
       </div>

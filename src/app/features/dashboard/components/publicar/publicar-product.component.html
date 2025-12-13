@@ -1,0 +1,348 @@
+<div class="min-h-screen bg-neutral-primary-soft p-4 md:p-6">
+  <div class="max-w-7xl mx-auto">
+    <!-- Header -->
+    <div class="mb-6 md:mb-8">
+      <h1 class="text-2xl md:text-3xl font-bold text-heading">
+        Publicar Producto
+      </h1>
+      <p class="text-body mt-2">
+        Completa la información de tu producto para alquilar
+      </p>
+    </div>
+
+    <div class="flex flex-col lg:flex-row gap-6">
+      <!-- Formulario -->
+      <div class="lg:w-2/3 space-y-6">
+        <!-- Información Básica -->
+        <div class="bg-white rounded-xl shadow-sm border border-default p-6">
+          <h2 class="text-lg font-semibold text-heading mb-6">
+            Información Básica
+          </h2>
+
+          <form [formGroup]="productoForm" class="space-y-5">
+            <!-- Título -->
+            <div>
+              <label class="block text-sm font-medium text-heading mb-2">
+                Título del producto <span class="text-red-500">*</span>
+              </label>
+              <input
+                type="text"
+                formControlName="titulo"
+                placeholder="Ej: Toyota Camry 2023"
+                class="w-full px-4 py-3 bg-neutral-primary-soft border border-default rounded-lg text-sm text-heading placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
+              />
+              @if (productoForm.get('titulo')?.invalid &&
+              productoForm.get('titulo')?.touched) {
+              <p class="text-red-500 text-xs mt-1">
+                El título es obligatorio (mín. 5 caracteres)
+              </p>
+              }
+            </div>
+
+            <!-- Precio y Categoría en fila -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label class="block text-sm font-medium text-heading mb-2">
+                  Precio por día (S/) <span class="text-red-500">*</span>
+                </label>
+                <div class="relative">
+                  <span
+                    class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500"
+                    >S/</span
+                  >
+                  <input
+                    type="number"
+                    formControlName="precio"
+                    min="0"
+                    step="0.01"
+                    placeholder="0.00"
+                    class="w-full pl-10 pr-4 py-3 bg-neutral-primary-soft border border-default rounded-lg text-sm text-heading placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
+                  />
+                </div>
+                @if (productoForm.get('precio')?.invalid &&
+                productoForm.get('precio')?.touched) {
+                <p class="text-red-500 text-xs mt-1">
+                  El precio es obligatorio
+                </p>
+                }
+              </div>
+
+              <div>
+                <label class="block text-sm font-medium text-heading mb-2">
+                  Categoría <span class="text-red-500">*</span>
+                </label>
+                <mat-form-field
+                  appearance="outline"
+                  class="w-full mat-select-custom"
+                >
+                  <mat-select
+                    formControlName="categoria"
+                    placeholder="Selecciona una categoría"
+                  >
+                    <!-- Trigger personalizado con icono -->
+                    <mat-select-trigger>
+                      @if (categoriaSeleccionada()) {
+                      <div class="flex items-center gap-2.5">
+                        <lucide-icon
+                          [img]="categoriaSeleccionada()!.icon"
+                          [size]="18"
+                          class="text-gray-600"
+                        ></lucide-icon>
+                        <span>{{ categoriaSeleccionada()!.viewValue }}</span>
+                      </div>
+                      }
+                    </mat-select-trigger>
+
+                    <!-- Opciones del dropdown -->
+                    @for (cat of categorias(); track cat.value) {
+                    <mat-option [value]="cat.value">
+                      <div class="flex items-center gap-2.5">
+                        <lucide-icon
+                          [img]="cat.icon"
+                          [size]="18"
+                          class="text-gray-600"
+                        ></lucide-icon>
+                        <span>{{ cat.viewValue }}</span>
+                      </div>
+                    </mat-option>
+                    }
+                  </mat-select>
+                </mat-form-field>
+                @if (productoForm.get('categoria')?.invalid &&
+                productoForm.get('categoria')?.touched) {
+                <p class="text-red-500 text-xs -mt-4 mb-2">
+                  La categoría es obligatoria
+                </p>
+                }
+              </div>
+            </div>
+
+            <!-- Descripción -->
+            <div>
+              <label class="block text-sm font-medium text-heading mb-2">
+                Descripción <span class="text-red-500">*</span>
+              </label>
+              <textarea
+                formControlName="descripcion"
+                rows="6"
+                placeholder="Describe tu producto, sus características, estado, etc."
+                class="w-full px-4 py-3 bg-neutral-primary-soft border rounded-lg text-sm text-heading placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all resize-none"
+                [class.border-red-500]="
+                  productoForm.get('descripcion')?.invalid &&
+                  productoForm.get('descripcion')?.touched
+                "
+                [class.border-default]="
+                  !(
+                    productoForm.get('descripcion')?.invalid &&
+                    productoForm.get('descripcion')?.touched
+                  )
+                "
+              ></textarea>
+              @if (productoForm.get('descripcion')?.invalid &&
+              productoForm.get('descripcion')?.touched) {
+              <p class="text-red-500 text-xs mt-1">
+                La descripción es obligatoria (mín. 20 caracteres)
+              </p>
+              } @else {
+              <p class="text-gray-500 text-xs mt-1">
+                {{ productoForm.get("descripcion")?.value?.length || 0 }} / 20
+                caracteres mínimo
+              </p>
+              }
+            </div>
+          </form>
+        </div>
+
+        <!-- Fotos -->
+        <div class="bg-white rounded-xl shadow-sm border border-default p-6">
+          <div class="flex items-center justify-between mb-4">
+            <h2 class="text-lg font-semibold text-heading">Fotografías</h2>
+            <span class="text-sm text-gray-500">Máximo 5 fotos</span>
+          </div>
+
+          <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3">
+            @for (foto of fotos(); track foto.id) {
+            <div
+              (click)="subirFoto($index)"
+              class="relative aspect-square rounded-lg border-2 border-dashed flex flex-col items-center justify-center cursor-pointer transition-all hover:border-purple-500 hover:bg-purple-50"
+              [class.border-purple-500]="foto.esPrincipal"
+              [class.bg-purple-50]="foto.esPrincipal"
+              [class.border-gray-300]="!foto.esPrincipal"
+            >
+              @if (foto.esPrincipal) {
+              <span
+                class="absolute -top-2 -right-2 bg-purple-600 text-white text-xs px-2 py-0.5 rounded-full font-medium"
+              >
+                Principal
+              </span>
+              }
+              <svg
+                class="w-8 h-8 text-gray-400 mb-2"
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                @if (foto.esPrincipal) {
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"
+                />
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"
+                />
+                } @else {
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M12 4v16m8-8H4"
+                />
+                }
+              </svg>
+              <span class="text-xs text-gray-600 text-center">{{
+                foto.nombre
+              }}</span>
+            </div>
+            }
+          </div>
+          <p class="text-xs text-gray-500 mt-3">
+            💡 Tip: La primera foto será la imagen principal de tu publicación
+          </p>
+        </div>
+
+        <!-- Botones -->
+        <div class="flex flex-col sm:flex-row gap-3">
+          <button
+            (click)="publicarProducto()"
+            [disabled]="!formularioValido()"
+            class="flex-1 bg-purple-600 hover:bg-purple-700 disabled:bg-gray-300 disabled:cursor-not-allowed text-white font-semibold py-3 px-6 rounded-lg transition-colors duration-200 shadow-sm"
+          >
+            Publicar Producto
+          </button>
+
+          <button
+            (click)="guardarBorrador()"
+            class="flex-1 bg-white hover:bg-gray-50 text-purple-600 font-semibold py-3 px-6 rounded-lg border-2 border-purple-600 transition-colors duration-200"
+          >
+            Guardar Borrador
+          </button>
+        </div>
+      </div>
+
+      <!-- Vista Previa -->
+      <div class="lg:w-1/3">
+        <div
+          class="bg-white rounded-xl shadow-sm border border-default p-6 sticky top-6"
+        >
+          <h2 class="text-lg font-semibold text-heading mb-4">Vista Previa</h2>
+
+          <div class="space-y-4">
+            <!-- Imagen placeholder -->
+            <div
+              class="aspect-video bg-gradient-to-br from-gray-100 to-gray-200 rounded-lg flex items-center justify-center"
+            >
+              <svg
+                class="w-16 h-16 text-gray-400"
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
+                />
+              </svg>
+            </div>
+
+            <!-- Info -->
+            <div>
+              <h3 class="font-bold text-xl text-heading mb-2">
+                {{ previewData().titulo }}
+              </h3>
+              <p class="text-body flex items-center gap-1 text-sm">
+                <svg
+                  class="w-4 h-4"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
+                  />
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
+                  />
+                </svg>
+                {{ previewData().ubicacion }}
+              </p>
+            </div>
+
+            <!-- Precio -->
+            <div class="py-4 border-y border-default">
+              <div class="text-3xl font-bold text-heading">
+                S/{{ previewData().precio | number : "1.2-2" }}
+                <span class="text-base font-normal text-gray-500"
+                  >/ {{ previewData().periodo }}</span
+                >
+              </div>
+            </div>
+
+            <!-- Ganancias -->
+            <div
+              class="bg-gradient-to-br from-purple-600 to-purple-700 p-5 rounded-lg space-y-3 shadow-lg"
+            >
+              <h4 class="text-white font-semibold text-sm opacity-90">
+                Estimación de ganancias
+              </h4>
+
+              <div class="space-y-2">
+                <div class="flex justify-between text-white text-sm">
+                  <span>Tarifa de servicio (10%):</span>
+                  <span class="font-medium"
+                    >-S/{{
+                      previewData().tarifaServicio | number : "1.2-2"
+                    }}</span
+                  >
+                </div>
+
+                <div
+                  class="border-t border-white/20 pt-2 flex justify-between text-white"
+                >
+                  <span class="font-semibold">Ganancia neta:</span>
+                  <span class="font-bold text-lg"
+                    >S/{{ previewData().gananciaNeta | number : "1.2-2" }}</span
+                  >
+                </div>
+              </div>
+            </div>
+
+            <!-- Info adicional -->
+            <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
+              <p class="text-xs text-blue-800 leading-relaxed">
+                💡 <strong>Consejo:</strong> Productos con fotos de calidad y
+                descripciones detalladas tienen un 80% más de probabilidad de
+                ser alquilados.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

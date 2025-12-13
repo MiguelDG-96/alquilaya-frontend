@@ -1,6 +1,6 @@
 import { Component, inject, signal, OnInit, OnDestroy } from '@angular/core';
-import { FormBuilder, Validators, ReactiveFormsModule, AbstractControl, FormGroup, FormArray, FormControl } from '@angular/forms';
-import { NgClass, NgFor } from '@angular/common';
+import { FormBuilder, Validators, ReactiveFormsModule, AbstractControl, FormGroup } from '@angular/forms';
+import { NgClass } from '@angular/common';
 import { Router } from '@angular/router';
 import { InputComponent } from '../../../../shared/components/input/input.component';
 import { AuthService } from '../../../../core/services/auth.service';
@@ -12,9 +12,10 @@ declare global {
   }
 }
 
+// Validador para verificar que las contraseñas coincidan
 export function passwordsMatchValidator(control: AbstractControl): { [key: string]: boolean } | null {
   const password = control.get('password'); 
-  const confirmPassword = control.get('registerConfirmPassword');
+  const confirmPassword = control.get('confirmPassword');
 
   if (password && confirmPassword && confirmPassword.touched && password.value !== confirmPassword.value) {
     return { 'passwordsNotMatching': true };
@@ -22,7 +23,7 @@ export function passwordsMatchValidator(control: AbstractControl): { [key: strin
   return null;
 }
 
-// Validador para código de verificación
+// Validador para código de verificación (6 dígitos)
 export function codeValidator(group: FormGroup): { [key: string]: boolean } | null {
   const codes = ['code0', 'code1', 'code2', 'code3', 'code4', 'code5'];
   const allFilled = codes.every(code => group.get(code)?.value);
@@ -30,33 +31,30 @@ export function codeValidator(group: FormGroup): { [key: string]: boolean } | nu
 }
 
 @Component({
-  selector: 'app-auth-page',
+  selector: 'app-register',
   standalone: true,
-  imports: [ReactiveFormsModule, NgClass, NgFor, InputComponent],
-  templateUrl: 'auth-page.component.html',
+  imports: [ReactiveFormsModule, NgClass, InputComponent],
+  templateUrl: './register.component.html',
 })
-export class AuthPageComponent implements OnInit, OnDestroy { 
+export class RegisterComponent implements OnInit, OnDestroy {
   private fb = inject(FormBuilder);
   private router = inject(Router);
   private authService = inject(AuthService);
 
-  // ID único para todo el componente (evita duplicados)
+  // ID único para todo el componente
   public componentId = Math.random().toString(36).substring(2, 11);
 
   // IDs únicos para cada input
   public inputIds = {
-    email: `auth-email-${this.componentId}`,
-    password: `auth-password-${this.componentId}`,
-    name: `auth-name-${this.componentId}`,
-    phone: `auth-phone-${this.componentId}`,
-    confirmPassword: `auth-confirm-password-${this.componentId}`,
-    rememberMe: `auth-remember-me-${this.componentId}`,
-    acceptTerms: `auth-accept-terms-${this.componentId}`
+    email: `register-email-${this.componentId}`,
+    password: `register-password-${this.componentId}`,
+    name: `register-name-${this.componentId}`,
+    phone: `register-phone-${this.componentId}`,
+    confirmPassword: `register-confirm-password-${this.componentId}`,
+    acceptTerms: `register-accept-terms-${this.componentId}`
   };
 
   // Señales para estado
-  public isLogin = signal(true);
-  public submitted = signal(false); 
   public loading = signal(false);
   public errorMessage = signal<string | null>(null);
   
@@ -68,17 +66,14 @@ export class AuthPageComponent implements OnInit, OnDestroy {
   public resendTimer = signal(0);
   private timerInterval: any = null;
 
-  // Formulario principal
-  public authForm = this.fb.group({
+  // Formulario principal de registro
+  public registerForm = this.fb.group({
+    name: ['', [Validators.required]],
+    phone: ['', [Validators.required, Validators.pattern(/^[0-9]{9}$/)]],
     email: ['', [Validators.required, Validators.email]],
     password: ['', [Validators.required, Validators.minLength(6)]],
-    rememberMe: [false],
-
-    // Campos de Registro
-    registerName: [''],
-    registerPhone: [''],
-    registerConfirmPassword: [''],
-    acceptTerms: [false],
+    confirmPassword: ['', [Validators.required]],
+    acceptTerms: [false, [Validators.requiredTrue]],
   }, { validators: passwordsMatchValidator });
 
   // Formulario de verificación (6 dígitos)
@@ -93,7 +88,6 @@ export class AuthPageComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.loadGoogleScript();
-    this.setValidatorsBasedOnMode(true);
     
     // Configurar callback global para Google
     window.handleGoogleLogin = (response: any) => {
@@ -115,9 +109,58 @@ export class AuthPageComponent implements OnInit, OnDestroy {
     }
   }
 
+  // ========== REGISTRO CON GOOGLE ==========
+  async onGoogleLogin(googleToken: string): Promise<void> {
+    this.errorMessage.set(null);
+    this.loading.set(true);
+
+    try {
+      await this.authService.loginWithGoogle(googleToken);
+      this.router.navigate(['/dashboard']);
+    } catch (error) {
+      const msg = error instanceof Error ? error.message : 'Error al registrarse con Google';
+      this.errorMessage.set(msg);
+    } finally {
+      this.loading.set(false);
+    }
+  }
+
+  // ========== REGISTRO TRADICIONAL ==========
+  async onSubmit(): Promise<void> {
+    this.errorMessage.set(null);
+
+    if (!this.registerForm.valid) {
+      this.registerForm.markAllAsTouched();
+      return;
+    }
+    
+    this.loading.set(true);
+    const { email, password, name, phone } = this.registerForm.value;
+
+    try {
+      const result = await this.authService.register({
+        fullName: name!,
+        email: email!,
+        password: password!,
+        phone: phone!
+      });
+
+      // Mostrar modal de verificación
+      this.openVerificationModal(email!);
+      
+      // Mensaje opcional
+      this.errorMessage.set(result.message || 'Registro exitoso. Revisa tu email para el código de verificación.');
+      
+    } catch (error) {
+      const msg = error instanceof Error ? error.message : 'Error al registrarse';
+      this.errorMessage.set(msg);
+    } finally {
+      this.loading.set(false);
+    }
+  }
+
   // ========== MÉTODOS DE VERIFICACIÓN ==========
   
-  // Mostrar modal de verificación
   openVerificationModal(email: string): void {
     this.verificationEmail.set(email);
     this.showVerificationModal.set(true);
@@ -125,14 +168,12 @@ export class AuthPageComponent implements OnInit, OnDestroy {
     this.resetVerificationForm();
   }
 
-  // Cerrar modal
   closeVerificationModal(): void {
     this.showVerificationModal.set(false);
     this.clearTimer();
     this.verificationEmail.set('');
   }
 
-  // Reiniciar formulario de verificación
   resetVerificationForm(): void {
     this.verificationForm.reset();
     // Enfocar el primer input
@@ -142,7 +183,6 @@ export class AuthPageComponent implements OnInit, OnDestroy {
     }, 100);
   }
 
-  // Manejar entrada de código (auto-focus al siguiente)
   onCodeInput(event: Event, index: number): void {
     const input = event.target as HTMLInputElement;
     const value = input.value;
@@ -153,7 +193,6 @@ export class AuthPageComponent implements OnInit, OnDestroy {
     }
   }
 
-  // Manejar teclas en código (backspace, flechas)
   onCodeKeydown(event: KeyboardEvent, index: number): void {
     if (event.key === 'Backspace' && !(event.target as HTMLInputElement).value && index > 0) {
       const prevInput = document.querySelector(`input[id="verification-code-${index - 1}-${this.componentId}"]`) as HTMLInputElement;
@@ -173,13 +212,11 @@ export class AuthPageComponent implements OnInit, OnDestroy {
     }
   }
 
-  // Obtener código completo
   getFullCode(): string {
     const codes = ['code0', 'code1', 'code2', 'code3', 'code4', 'code5'];
     return codes.map(code => this.verificationForm.get(code)?.value || '').join('');
   }
 
-  // Enviar verificación
   async onVerifySubmit(): Promise<void> {
     this.verifying.set(true);
     this.errorMessage.set(null);
@@ -203,38 +240,32 @@ export class AuthPageComponent implements OnInit, OnDestroy {
       // Mostrar mensaje de éxito
       this.errorMessage.set('✓ ' + (result.message || 'Email verificado exitosamente'));
       
-      // Cambiar a modo login después de 2 segundos
+      // Navegar a login después de 2 segundos
       setTimeout(() => {
-        this.toggleAuthMode(true);
-        this.errorMessage.set(null);
+        this.router.navigate(['/login']);
       }, 2000);
       
     } catch (error) {
       const msg = error instanceof Error ? error.message : 'Error al verificar email';
       this.errorMessage.set(msg);
-      
-      // Resetear el formulario si hay error
       this.resetVerificationForm();
     } finally {
       this.verifying.set(false);
     }
   }
 
-  // Reenviar código
   async onResendCode(): Promise<void> {
     this.resending.set(true);
     this.errorMessage.set(null);
 
     try {
-      // Usar el endpoint de registro nuevamente para reenviar
       const email = this.verificationEmail();
       
-      // O usar un endpoint específico de reenvío si existe
-      // Por ahora, simulamos reenviando el registro
+      // Aquí deberías llamar a un método específico de reenvío en tu AuthService
       const result = await this.authService.register({
-        fullName: '', // Estos campos no son necesarios para reenviar
+        fullName: '', 
         email: email,
-        password: 'temporal123', // Contraseña temporal
+        password: 'temporal123',
         phone: '999999999'
       });
 
@@ -249,9 +280,8 @@ export class AuthPageComponent implements OnInit, OnDestroy {
     }
   }
 
-  // Temporizador para reenviar
   private startResendTimer(): void {
-    this.resendTimer.set(60); // 60 segundos
+    this.resendTimer.set(60);
     this.clearTimer();
     
     this.timerInterval = setInterval(() => {
@@ -271,135 +301,8 @@ export class AuthPageComponent implements OnInit, OnDestroy {
     }
   }
 
-  // ========== MÉTODOS EXISTENTES ==========
-  
-  toggleAuthMode(isLoginMode: boolean): void {
-    this.isLogin.set(isLoginMode);
-    this.submitted.set(false); 
-    this.errorMessage.set(null);
-    this.authForm.reset();
-    this.setValidatorsBasedOnMode(isLoginMode);
-  }
-
-  private setValidatorsBasedOnMode(isLoginMode: boolean): void {
-    const controls = this.authForm.controls;
-    const registerFields: AbstractControl[] = [
-      controls.registerName, 
-      controls.registerPhone,
-      controls.registerConfirmPassword
-    ];
-    
-    if (isLoginMode) {
-      registerFields.forEach(control => {
-        control.clearValidators();
-        control.setValue('');
-        control.markAsUntouched();
-      });
-      controls.acceptTerms.clearValidators();
-      controls.acceptTerms.setValue(false);
-    } else {
-      controls.registerName.setValidators([Validators.required]);
-      controls.registerPhone.setValidators([Validators.required, Validators.pattern(/^[0-9]{9}$/)]);
-      controls.registerConfirmPassword.setValidators([Validators.required]);
-      controls.acceptTerms.setValidators([Validators.requiredTrue]);
-    }
-    
-    this.authForm.updateValueAndValidity();
-  }
-
-  // ========== LOGIN CON GOOGLE ==========
-  async onGoogleLogin(googleToken: string): Promise<void> {
-    this.errorMessage.set(null);
-    this.loading.set(true);
-
-    try {
-      await this.authService.loginWithGoogle(googleToken);
-      this.router.navigate(['/dashboard']);
-    } catch (error) {
-      const msg = error instanceof Error ? error.message : 'Error al iniciar sesión con Google';
-      this.errorMessage.set(msg);
-    } finally {
-      this.loading.set(false);
-    }
-  }
-
-  // ========== LOGIN TRADICIONAL ==========
-  async onSubmit(): Promise<void> {
-    this.submitted.set(true);
-    this.errorMessage.set(null);
-
-    if (!this.authForm.valid) {
-      this.authForm.markAllAsTouched();
-      return;
-    }
-    
-    if (this.isLogin()) {
-      await this.handleLogin();
-    } else {
-      await this.handleRegister();
-    }
-  }
-
-  private async handleLogin(): Promise<void> {
-    this.loading.set(true);
-    const { email, password } = this.authForm.value;
-
-    try {
-      await this.authService.login(email!, password!);
-      this.router.navigate(['/dashboard']);
-    } catch (error) {
-      const msg = error instanceof Error ? error.message : 'Error al iniciar sesión';
-      this.errorMessage.set(msg);
-    } finally {
-      this.loading.set(false);
-    }
-  }
-
-  // MODIFICADO: Ahora abre el modal después del registro
-  private async handleRegister(): Promise<void> {
-    this.loading.set(true);
-    const { email, password, registerName, registerPhone } = this.authForm.value;
-
-    try {
-      const result = await this.authService.register({
-        fullName: registerName!,
-        email: email!,
-        password: password!,
-        phone: registerPhone!
-      });
-
-      // Mostrar modal de verificación
-      this.openVerificationModal(email!);
-      
-      // Mensaje opcional
-      this.errorMessage.set(result.message || 'Registro exitoso. Revisa tu email para el código de verificación.');
-      
-    } catch (error) {
-      const msg = error instanceof Error ? error.message : 'Error al registrarse';
-      this.errorMessage.set(msg);
-    } finally {
-      this.loading.set(false);
-    }
-  }
-
-  // ========== RECUPERAR CONTRASEÑA ==========
-  async onForgotPassword(): Promise<void> {
-    const email = this.authForm.get('email')?.value;
-    
-    if (!email) {
-      this.errorMessage.set('Ingresa tu email para recuperar la contraseña');
-      return;
-    }
-
-    this.loading.set(true);
-    try {
-      const result = await this.authService.forgotPassword(email);
-      this.errorMessage.set(result.message || 'Revisa tu email para recuperar tu contraseña');
-    } catch (error) {
-      const msg = error instanceof Error ? error.message : 'Error al recuperar contraseña';
-      this.errorMessage.set(msg);
-    } finally {
-      this.loading.set(false);
-    }
+  // ========== NAVEGACIÓN A LOGIN ==========
+  navigateToLogin(): void {
+    this.router.navigate(['/login']);
   }
 }

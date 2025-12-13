@@ -3,16 +3,83 @@
 
 @import "tailwindcss";
 
+/* Angular Material - Importar primero */
+@import "@angular/material/prebuilt-themes/azure-blue.css";
+
 @import "flowbite/src/themes/default";
 @plugin "flowbite/plugin";
 @source "../node_modules/flowbite";
 
 @theme {
+  --color-marca: #662380;
+  --font-family-sans: 'Inter', 'Roboto', 'Helvetica Neue', sans-serif;
+}
+
+/* Variables CSS personalizadas para Material */
+:root {
+  --mdc-theme-primary: #662380; /* Color principal (tu color marca) */
+  --mdc-theme-secondary: #424242;
+  --mdc-theme-surface: #ffffff;
+  --mdc-theme-background: #f9fafb;
+  --mdc-theme-on-primary: #ffffff;
+  --mdc-theme-on-secondary: #ffffff;
+  --mdc-theme-on-surface: #000000;
+  --mdc-theme-error: #d32f2f;
   
-    --color-marca: #662380;
-  
+  /* Focus color */
+  --mat-form-field-focus-select-border-color: #662380;
+  --mat-form-field-focus-label-color: #662380;
 }
 
 /* input.css */
 @custom-variant dark (&:where(.dark, .dark *));
 
+/* Reset básico */
+html, body { 
+  height: 100%;
+  margin: 0;
+  font-family: var(--font-family-sans);
+}
+
+/* Override específico para el focus de Material */
+.mat-mdc-form-field.mat-focused .mdc-notched-outline__leading,
+.mat-mdc-form-field.mat-focused .mdc-notched-outline__notch,
+.mat-mdc-form-field.mat-focused .mdc-notched-outline__trailing {
+  border-color: #662380 !important;
+}
+
+.mat-mdc-form-field.mat-focused .mat-mdc-floating-label {
+  color: #662380 !important;
+}
+
+.mat-mdc-form-field.mat-focused .mat-mdc-select-arrow {
+  color: #662380 !important;
+}
+
+/* Fix para integrar Material con Tailwind */
+.mat-mdc-form-field {
+  @apply w-full;
+}
+
+/* Botones mejorados */
+.mat-mdc-raised-button.mat-primary:not(:disabled):hover {
+  @apply shadow-md transform -translate-y-0.5 transition-all duration-200;
+}
+
+/* Cards con mejoras */
+.mat-mdc-card {
+  @apply overflow-hidden transition-shadow duration-300;
+}
+
+/* Snackbars con colores Tailwind */
+.mat-mdc-snack-bar-container {
+  &.success-snackbar {
+    --mdc-snackbar-container-color: #10b981;
+    --mat-snack-bar-button-color: #ffffff;
+  }
+  
+  &.error-snackbar {
+    --mdc-snackbar-container-color: #ef4444;
+    --mat-snack-bar-button-color: #ffffff;
+  }
+}

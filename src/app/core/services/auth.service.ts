@@ -3,6 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { Observable, throwError, lastValueFrom } from 'rxjs';
 import { catchError, tap } from 'rxjs/operators';
+import { environment } from '../../../environments/environment';
 
 export interface UserData {
   uid?: string;
@@ -60,8 +61,8 @@ export class AuthService {
   private http = inject(HttpClient);
   private router = inject(Router);
 
-  private readonly API_URL = 'https://pseudoaggressive-crescentic-obdulia.ngrok-free.dev/api/v1';
-  private readonly BASE_URL = 'https://pseudoaggressive-crescentic-obdulia.ngrok-free.dev';
+  private readonly API_URL = environment.API_URL;
+  private readonly BASE_URL = environment.BASE_URL;
 
   // Señales para estado
   public currentUser = signal<UserData | null>(null);
@@ -366,6 +367,8 @@ export class AuthService {
   // ========== UTILIDADES PÚBLICAS ==========
   isAuthenticated(): boolean {
     return !!this.accessToken && !!this.currentUser();
+    // console.log('⚠️ Modo desarrollo: autenticación deshabilitada');
+    // return true; 
   }
 
   getToken(): string | null {

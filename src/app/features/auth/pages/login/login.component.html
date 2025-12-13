@@ -1,0 +1,210 @@
+
+<!-- Contenedor Principal -->
+<div class="flex items-center justify-center min-h-screen p-4 bg-gray-50">
+  <div class="bg-white rounded-2xl shadow-2xl max-w-4xl w-full overflow-hidden my-8">
+    <div class="grid grid-cols-1 lg:grid-cols-2">
+      
+      <!-- Lado Izquierdo (Branding) -->
+      <div class="hidden lg:flex flex-col justify-center p-12 text-white relative overflow-hidden" 
+           style="background: linear-gradient(135deg, #662380 0%, #8B4FA8 100%)">
+        
+        <!-- PATRÓN DE PUNTOS SOLO EN MÓVIL -->
+        <div class="lg:hidden absolute inset-0 z-0 opacity-20"
+             style="
+               background-image: radial-gradient(currentColor 1px, transparent 1px);
+               background-size: 20px 20px;
+               color: #a78bfa;
+             ">
+        </div>
+        
+        <div class="relative z-10">
+          <div class="flex items-end gap-2 mb-8">
+            <figure>
+              <img src="./assets/img/logo-auth-alquilaYa.svg" alt="Logo Alquila Ya!" class="h-10 w-auto">
+            </figure>
+          </div>
+
+          <h2 class="text-3xl mb-4">
+            ¡Bienvenido de nuevo!
+          </h2>
+          <p class="text-purple-100 text-lg mb-8">
+            Accede a miles de productos disponibles para alquilar
+          </p>
+
+          <div class="space-y-4">
+            @for (benefit of [
+              '100% Seguro y Verificado', 
+              'Miles de productos disponibles', 
+              'Proceso rápido y fácil'
+            ]; track benefit) {
+              <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-full bg-white bg-opacity-20 flex items-center justify-center text-xl">
+                  ✔
+                </div>
+                <span>{{ benefit }}</span>
+              </div>
+            }
+          </div>
+        </div>
+      </div>
+
+      <!-- Lado Derecho (Formulario) -->
+      <div class="p-8 lg:p-12 relative">
+        
+        <!-- PATRÓN DE PUNTOS SOLO EN MÓVIL para el lado del formulario -->
+        <div class="lg:hidden absolute inset-0 z-0 opacity-10"
+             style="
+               background-image: radial-gradient(currentColor 1px, transparent 1px);
+               background-size: 25px 25px;
+               color: #662380;
+             ">
+        </div>
+        
+        <!-- Logo Móvil -->
+        <div class="lg:hidden flex items-center justify-center gap-1.5 mb-6 relative z-10">
+          <figure class="flex items-center justify-center">
+            <img src="./assets/img/logo-alquilaYa.svg" alt="Logo Alquila Ya!" class="h-12 w-auto">
+          </figure>
+        </div>
+
+        <!-- Título -->
+        <div class="relative z-10">
+          <h3 class="text-2xl mb-2 text-gray-800">
+            Iniciar Sesión
+          </h3>
+          <p class="text-gray-600 mb-6">
+            Ingresa tus credenciales para continuar
+          </p>
+        </div>
+        
+        <!-- Mensaje de Error -->
+        @if (errorMessage()) {
+          <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg mb-6 relative z-10" role="alert">
+            <span class="block">{{ errorMessage() }}</span>
+          </div>
+        }
+
+        <!-- Google Login -->
+        <div class="mb-6 relative z-10">
+          <div id="g_id_onload"
+               data-client_id="430705636704-i9t93p9j0s60135ec6pq665a8qlepeoa.apps.googleusercontent.com"
+               data-callback="handleGoogleLogin"
+               data-auto_prompt="false">
+          </div>
+          <div class="g_id_signin" 
+               data-type="standard" 
+               data-theme="outline" 
+               data-text="continue_with" 
+               data-shape="rectangular" 
+               data-logo_alignment="left"
+               data-width="100%">
+          </div>
+        </div>
+
+        <!-- Separador -->
+        <div class="relative mb-6 z-10">
+          <div class="absolute inset-0 flex items-center">
+            <div class="w-full border-t border-gray-300"></div>
+          </div>
+          <div class="relative flex justify-center text-sm">
+            <span class="px-2 bg-white text-gray-500">o</span>
+          </div>
+        </div>
+
+        <!-- Formulario de Login -->
+        <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="space-y-4 relative z-10">
+          
+          <!-- Email -->
+          <div>
+            <label [for]="inputIds.email" class="block text-sm mb-2 text-gray-700">
+              Correo electrónico
+            </label>
+            <app-input 
+              [id]="inputIds.email"
+              formControlName="email" 
+              type="email" 
+              placeholder="tu@email.com" 
+              iconLeft="fas fa-envelope">
+            </app-input>
+            @if (loginForm.get('email')?.touched && loginForm.get('email')?.invalid) {
+              <p class="text-xs text-red-500 mt-1">Ingresa un correo válido.</p>
+            }
+          </div>
+
+          <!-- Password -->
+          <div>
+            <label [for]="inputIds.password" class="block text-sm mb-2 text-gray-700">
+              Contraseña
+            </label>
+            <app-input 
+              [id]="inputIds.password"
+              formControlName="password" 
+              type="password" 
+              placeholder="••••••••" 
+              iconLeft="fas fa-lock">
+            </app-input>
+            @if (loginForm.get('password')?.touched) {
+              @if (loginForm.get('password')?.hasError('required')) {
+                <p class="text-xs text-red-500 mt-1">La contraseña es obligatoria.</p>
+              } @else if (loginForm.get('password')?.hasError('minlength')) {
+                <p class="text-xs text-red-500 mt-1">La contraseña debe tener al menos 6 caracteres.</p>
+              }
+            }
+          </div>
+
+          <!-- Recordarme y Olvidé Contraseña -->
+          <div class="flex items-center justify-between">
+            <label class="flex items-center">
+              <input 
+                [id]="inputIds.rememberMe"
+                type="checkbox" 
+                formControlName="rememberMe" 
+                class="mr-2 h-4 w-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500" />
+              <span class="text-sm text-gray-600">Recordarme</span>
+            </label>
+            <button 
+              type="button" 
+              (click)="onForgotPassword()"
+              class="text-sm hover:underline font-medium" 
+              style="color: #662380">
+              ¿Olvidaste tu contraseña?
+            </button>
+          </div>
+
+          <!-- Botón de Envío -->
+          <button
+            type="submit"
+            [disabled]="loginForm.invalid || loading()"
+            class="w-full py-3 rounded-lg text-white text-lg font-semibold transition-all duration-200 shadow-lg flex items-center justify-center gap-2 relative z-10"
+            [ngClass]="{
+              'bg-gray-400 cursor-not-allowed': loginForm.invalid || loading(),
+              'hover:opacity-90': !loginForm.invalid && !loading()
+            }"
+            style="background: #662380"
+          >
+            @if (loading()) {
+              <i class="fa-solid fa-spinner fa-spin"></i>
+              <span>Cargando...</span>
+            } @else {
+              <span>Iniciar Sesión</span>
+            }
+          </button>
+        </form>
+
+        <!-- Footer -->
+        <div class="mt-6 text-center relative z-10">
+          <span class="text-gray-600">
+            ¿No tienes cuenta?
+          </span>
+          <button
+            (click)="navigateToRegister()"
+            class="hover:underline font-semibold ml-1"
+            style="color: #662380"
+          >
+            Regístrate
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

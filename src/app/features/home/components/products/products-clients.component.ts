@@ -1,10 +1,11 @@
 import { Component, ViewChild, ElementRef, AfterViewInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms'; // ¡NUEVO: Importar FormsModule!
 import { 
   LucideAngularModule, 
   Home, Car, Building2, Wrench, Laptop, Bike, Calendar, 
   Armchair, SlidersHorizontal, MapPin, Star, Heart, 
-  Music, Shirt 
+  Music, Shirt, Search // ¡NUEVO: Importar Search icon!
 } from 'lucide-angular';
 
 interface Product {
@@ -22,12 +23,18 @@ interface Product {
 @Component({
   selector: 'app-products-clients',
   standalone: true,
-  imports: [CommonModule, LucideAngularModule],
+  imports: [CommonModule, FormsModule, LucideAngularModule], // ¡NUEVO: Agregar FormsModule aquí!
   templateUrl: './products-clients.component.html',
   styleUrls: ['./products-clients.component.css']
 })
 export class ProductsClientsComponent implements AfterViewInit {
   @ViewChild('scrollContainer') scrollContainer!: ElementRef<HTMLDivElement>;
+
+  // ¡NUEVO: Propiedad para el buscador
+  searchQuery: string = '';
+  
+  // ¡NUEVO: Array para productos filtrados
+  filteredProducts: Product[] = [];
 
   // Iconos de Lucide
   readonly Home = Home;
@@ -44,6 +51,7 @@ export class ProductsClientsComponent implements AfterViewInit {
   readonly Heart = Heart;
   readonly Music = Music;
   readonly Shirt = Shirt;
+  readonly Search = Search; // ¡NUEVO: Icono de búsqueda
 
   selectedCategory: string = 'all';
 
@@ -100,8 +108,34 @@ export class ProductsClientsComponent implements AfterViewInit {
       price: 35,
       priceUnit: 'día',
       isFeatured: true
+    },
+    // Puedes agregar más productos para probar la búsqueda
+    {
+      id: 5,
+      name: 'Bicicleta de Montaña',
+      location: 'Barranco',
+      rating: 4.6,
+      reviewCount: 45,
+      price: 8,
+      priceUnit: 'día',
+      isFeatured: false
+    },
+    {
+      id: 6,
+      name: 'Guitarra Acústica Yamaha',
+      location: 'La Molina',
+      rating: 4.9,
+      reviewCount: 78,
+      price: 15,
+      priceUnit: 'día',
+      isFeatured: true
     }
   ];
+
+  constructor() {
+    // Inicializar productos filtrados con todos los productos
+    this.filteredProducts = [...this.products];
+  }
 
   ngAfterViewInit(): void {
     this.setupHorizontalScroll();
@@ -120,6 +154,39 @@ export class ProductsClientsComponent implements AfterViewInit {
     container.style.scrollbarWidth = 'none';
   }
 
+  // ¡NUEVO: Método para realizar búsqueda
+  performSearch(): void {
+    if (!this.searchQuery.trim()) {
+      // Si no hay término de búsqueda, mostrar todos los productos
+      this.filteredProducts = [...this.products];
+      return;
+    }
+
+    const searchTerm = this.searchQuery.toLowerCase().trim();
+    
+    this.filteredProducts = this.products.filter(product => {
+      // Buscar en nombre, ubicación y categoría (si tuvieras categorías en los productos)
+      return product.name.toLowerCase().includes(searchTerm) ||
+             product.location.toLowerCase().includes(searchTerm);
+    });
+    
+    console.log('Búsqueda realizada:', searchTerm, 'Resultados:', this.filteredProducts.length);
+  }
+
+  // ¡NUEVO: Método para limpiar búsqueda
+  clearSearch(): void {
+    this.searchQuery = '';
+    this.filteredProducts = [...this.products];
+  }
+
+  // ¡NUEVO: Detecta cuando el usuario presiona Enter o escribe
+  onSearchInput(event?: Event): void {
+    // Si se llama sin evento o es una tecla específica
+    if (!event || (event as KeyboardEvent).key === 'Enter') {
+      this.performSearch();
+    }
+  }
+
   // Método para scroll con rueda del mouse
   onCategoriesWheel(event: WheelEvent): void {
     if (this.scrollContainer?.nativeElement) {
@@ -130,14 +197,30 @@ export class ProductsClientsComponent implements AfterViewInit {
 
   selectCategory(categoryId: string): void {
     this.selectedCategory = categoryId;
+    
+    // ¡NUEVO: Filtrar productos por categoría si hay búsqueda activa
+    if (categoryId === 'all') {
+      this.filteredProducts = this.searchQuery.trim() 
+        ? this.products.filter(p => 
+            p.name.toLowerCase().includes(this.searchQuery.toLowerCase()) ||
+            p.location.toLowerCase().includes(this.searchQuery.toLowerCase())
+          )
+        : [...this.products];
+    } else {
+      // Aquí podrías agregar lógica para filtrar por categoría real
+      // Por ahora, si hay búsqueda, mantenemos ese filtro
+      this.performSearch();
+    }
   }
 
   toggleFavorite(productId: number): void {
     console.log('Toggle favorite for product:', productId);
+    // Podrías agregar lógica para marcar/desmarcar favoritos
   }
 
   viewMore(productId: number): void {
     console.log('View more details for product:', productId);
+    // Aquí podrías navegar a una página de detalles
   }
 
   getIconComponent(iconName: string): any {

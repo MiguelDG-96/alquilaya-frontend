@@ -1,0 +1,174 @@
+/* Personalizar mat-select para que coincida con los inputs de Tailwind */
+
+/* Contenedor del select */
+::ng-deep .mat-select-custom {
+  width: 100%;
+}
+
+::ng-deep .mat-select-custom .mat-mdc-text-field-wrapper {
+  background-color: #f9fafb;
+  border-radius: 0.5rem;
+  padding: 0;
+}
+
+/* Ocultar el borde por defecto de Material */
+::ng-deep .mat-select-custom .mdc-notched-outline__leading,
+::ng-deep .mat-select-custom .mdc-notched-outline__notch,
+::ng-deep .mat-select-custom .mdc-notched-outline__trailing {
+  border: none !important;
+}
+
+/* Añadir borde personalizado */
+::ng-deep .mat-select-custom .mat-mdc-form-field-flex {
+  border: 1px solid #e5e7eb;
+  border-radius: 0.5rem;
+  padding: 0.75rem 1rem;
+  min-height: 46px;
+  align-items: center;
+}
+
+/* Estado hover */
+::ng-deep .mat-select-custom:hover .mat-mdc-form-field-flex {
+  border-color: #d1d5db;
+}
+
+/* Estado focus - purple como los demás campos */
+::ng-deep .mat-select-custom.mat-focused .mat-mdc-form-field-flex {
+  border-color: #9333ea !important;
+  box-shadow: 0 0 0 3px rgba(147, 51, 234, 0.1);
+  background-color: white;
+}
+
+::ng-deep .mat-select-custom.mat-focused .mat-mdc-text-field-wrapper {
+  background-color: white;
+}
+
+/* Remover label flotante */
+::ng-deep .mat-select-custom .mat-mdc-form-field-subscript-wrapper {
+  display: none;
+}
+
+::ng-deep .mat-select-custom .mdc-floating-label {
+  display: none;
+}
+
+/* Estilo del valor seleccionado */
+::ng-deep .mat-select-custom .mat-mdc-select-value {
+  color: #111827;
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+}
+
+/* Placeholder */
+::ng-deep .mat-select-custom .mat-mdc-select-placeholder {
+  color: #9ca3af;
+  font-size: 0.875rem;
+}
+
+/* Flecha del select */
+::ng-deep .mat-select-custom .mat-mdc-select-arrow-wrapper {
+  padding-left: 0.5rem;
+}
+
+::ng-deep .mat-select-custom .mat-mdc-select-arrow {
+  color: #6b7280;
+  width: 0;
+  height: 0;
+  border-left: 5px solid transparent;
+  border-right: 5px solid transparent;
+  border-top: 5px solid currentColor;
+  border-bottom: none;
+}
+
+/* Estado invalid */
+::ng-deep .mat-select-custom.mat-form-field-invalid .mat-mdc-form-field-flex {
+  border-color: #ef4444 !important;
+}
+
+/* Panel del dropdown */
+::ng-deep .mat-mdc-select-panel {
+  border-radius: 0.5rem !important;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05) !important;
+  margin-top: 0.25rem;
+  max-height: 256px !important;
+  background-color: white;
+}
+
+/* Opciones del dropdown */
+::ng-deep .mat-mdc-option {
+  padding: 0.75rem 1rem !important;
+  font-size: 0.875rem !important;
+  min-height: auto !important;
+  transition: background-color 0.15s ease;
+}
+
+::ng-deep .mat-mdc-option:hover:not(.mdc-list-item--disabled) {
+  background-color: #f3f4f6 !important;
+}
+
+/* Opción seleccionada */
+::ng-deep .mat-mdc-option.mdc-list-item--selected:not(.mdc-list-item--disabled) {
+  background-color: #f3e8ff !important;
+  color: #7c3aed !important;
+}
+
+::ng-deep .mat-mdc-option.mdc-list-item--selected:not(.mdc-list-item--disabled):not(.mat-mdc-option-multiple) {
+  background-color: #f3e8ff !important;
+}
+
+/* Opción activa (con teclado) */
+::ng-deep .mat-mdc-option.mat-mdc-option-active {
+  background-color: #faf5ff !important;
+}
+
+/* Checkmark cuando está seleccionado */
+::ng-deep .mat-pseudo-checkbox-checked::after {
+  color: #7c3aed !important;
+}
+
+/* Remover ripple effect (opcional) */
+::ng-deep .mat-mdc-option .mat-ripple {
+  display: none;
+}
+
+/* Ajustar padding interno */
+::ng-deep .mat-select-custom .mat-mdc-form-field-infix {
+  padding: 0 !important;
+  border: none !important;
+  min-height: auto !important;
+}
+
+/* Remover espacio superior/inferior extra */
+::ng-deep .mat-select-custom .mat-mdc-form-field-flex {
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+}
+
+/* Ajustar altura del trigger */
+::ng-deep .mat-select-custom .mat-mdc-select-trigger {
+  height: auto !important;
+  min-height: auto !important;
+}
+
+/* Estilos para los iconos de Lucide en el select */
+::ng-deep .mat-mdc-option lucide-icon,
+::ng-deep .mat-mdc-select-trigger lucide-icon {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+::ng-deep .mat-mdc-option lucide-icon svg,
+::ng-deep .mat-mdc-select-trigger lucide-icon svg {
+  stroke-width: 2;
+}
+
+/* Hover effect para los iconos */
+::ng-deep .mat-mdc-option:hover lucide-icon {
+  color: #7c3aed;
+}
+
+/* Icono en opción seleccionada */
+::ng-deep .mat-mdc-option.mdc-list-item--selected lucide-icon {
+  color: #7c3aed;
+}

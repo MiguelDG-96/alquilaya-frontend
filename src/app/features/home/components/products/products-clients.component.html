@@ -1,18 +1,50 @@
 <!-- WRAPPER con z-index y position para evitar conflictos con el padre -->
 <div class="relative z-0">
   <div class="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-    <!-- Header con título y filtros -->
-    <div class="flex flex-col sm:flex-row sm:items-center justify-between mb-8 gap-4">
+    <!-- Header con título, buscador y filtros en una línea -->
+    <div class="flex flex-col md:flex-row md:items-center justify-between mb-8 gap-4">
+      <!-- Título -->
       <h1 class="text-2xl sm:text-3xl font-bold text-gray-900">Explora nuestros productos</h1>
-      <div class="flex items-center gap-3">
-        <button class="hidden sm:flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">
-          <lucide-icon [img]="SlidersHorizontal" [size]="20"></lucide-icon>
-          <span class="font-medium">Filtros</span>
-        </button>
-        <!-- Botón de filtros para móvil -->
-        <button class="sm:hidden flex items-center justify-center w-10 h-10 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">
-          <lucide-icon [img]="SlidersHorizontal" [size]="18"></lucide-icon>
-        </button>
+      
+      <!-- Contenedor para buscador móvil y botones de filtro -->
+      <div class="flex items-center gap-3 w-full md:w-auto">
+        <!-- Buscador para móvil (oculto en desktop) -->
+        <div class="md:hidden flex-1">
+          <form (ngSubmit)="performSearch()" class="w-full">
+            <div class="relative">
+              <input
+                type="text"
+                name="searchQuery"
+                [(ngModel)]="searchQuery"
+                placeholder="Buscar productos..."
+                class="w-full py-2.5 pl-10 pr-4 text-gray-700 placeholder-gray-400 border border-gray-200 focus:border-purple-500 focus:ring-1 focus:ring-purple-300 bg-white rounded-lg shadow-sm text-sm transition-all"
+                aria-label="Campo de búsqueda"
+                (keyup.enter)="performSearch()"
+              />
+              <button
+                type="button"
+                (click)="performSearch()"
+                class="absolute left-0 top-0 mt-2.5 ml-3 text-gray-400 hover:text-purple-600 transition-colors"
+              >
+                <i class="fas fa-search"></i>
+              </button>
+            </div>
+          </form>
+        </div>
+
+        <!-- Botones de filtros -->
+        <div class="flex items-center gap-2 shrink-0">
+          <!-- Botón de filtros para desktop -->
+          <button class="hidden md:flex items-center gap-2 px-4 py-2.5 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">
+            <lucide-icon [img]="SlidersHorizontal" [size]="20"></lucide-icon>
+            <span class="font-medium">Filtros</span>
+          </button>
+          
+          <!-- Botón de filtros para móvil -->
+          <button class="flex items-center justify-center w-10 h-10 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">
+            <lucide-icon [img]="SlidersHorizontal" [size]="18"></lucide-icon>
+          </button>
+        </div>
       </div>
     </div>
 
@@ -34,8 +66,8 @@
         <!-- Contenedor con scroll invisible -->
         <div class="relative flex-1 overflow-hidden">
           <!-- Fade en los bordes para indicar scroll -->
-          <div class="absolute left-0 top-0 bottom-0 w-4 sm:w-8 bg-gradient-to-r from-white via-white to-transparent z-10 pointer-events-none"></div>
-          <div class="absolute right-0 top-0 bottom-0 w-4 sm:w-8 bg-gradient-to-l from-white via-white to-transparent z-10 pointer-events-none"></div>
+          <div class="absolute left-0 top-0 bottom-0 w-4 sm:w-8 bg-linear-to-r from-white via-white to-transparent z-10 pointer-events-none"></div>
+          <div class="absolute right-0 top-0 bottom-0 w-4 sm:w-8 bg-linear-to-l from-white via-white to-transparent z-10 pointer-events-none"></div>
           
           <!-- Contenedor de scroll con botones responsive -->
           <div 
@@ -52,7 +84,7 @@
               }"
               class="shrink-0 flex items-center gap-1 sm:gap-2 px-3 sm:px-5 py-2 sm:py-3 rounded-full border transition-all font-medium shadow-sm hover:shadow whitespace-nowrap text-sm sm:text-base">
               <lucide-icon [img]="getIconComponent(category.icon)" [size]="14" class="sm:[size]='18'"></lucide-icon>
-              <span class="truncate max-w-[80px] sm:max-w-none">{{ category.name }}</span>
+              <span class="truncate max-w-20 sm:max-w-none">{{ category.name }}</span>
             </button>
           </div>
         </div>
@@ -61,7 +93,7 @@
 
     <!-- Grid de productos responsive -->
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
-      <div *ngFor="let product of products" class="bg-white rounded-xl sm:rounded-2xl shadow-sm sm:shadow-md hover:shadow-lg sm:hover:shadow-xl transition-shadow overflow-hidden">
+      <div *ngFor="let product of filteredProducts" class="bg-white rounded-xl sm:rounded-2xl shadow-sm sm:shadow-md hover:shadow-lg sm:hover:shadow-xl transition-shadow overflow-hidden">
         <!-- Badge destacado y botón favorito -->
         <div class="relative">
           <div *ngIf="product.isFeatured" class="absolute top-3 sm:top-4 left-3 sm:left-4 z-10">

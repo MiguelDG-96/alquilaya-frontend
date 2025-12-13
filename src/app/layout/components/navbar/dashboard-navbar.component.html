@@ -2,16 +2,16 @@
   class="fixed top-0 z-50 w-full bg-neutral-primary-soft border-b border-default"
 >
   <div class="px-3 py-3 lg:px-5 lg:pl-3">
-    <div class="flex items-center justify-between">
-      <div class="flex items-center justify-start rtl:justify-end">
+    <div class="flex items-center justify-between gap-4">
+      <!-- Sección izquierda: Botón menú + Logo -->
+      <div class="flex items-center gap-3 shrink-0">
+        <!-- Botón hamburguesa con evento click -->
         <button
-          data-drawer-target="top-bar-sidebar"
-          data-drawer-toggle="top-bar-sidebar"
-          aria-controls="top-bar-sidebar"
+          (click)="toggleSidebar()"
           type="button"
-          class="sm:hidden text-heading bg-transparent box-border border border-transparent hover:bg-neutral-secondary-medium focus:ring-4 focus:ring-neutral-tertiary font-medium leading-5 rounded-base text-sm p-2 focus:outline-none"
+          class="text-heading bg-transparent box-border border border-transparent hover:bg-neutral-secondary-medium focus:ring-4 focus:ring-neutral-tertiary font-medium leading-5 rounded-base text-sm p-2 focus:outline-none"
         >
-          <span class="sr-only">Open sidebar</span>
+          <span class="sr-only">Toggle sidebar</span>
           <svg
             class="w-6 h-6"
             aria-hidden="true"
@@ -29,20 +29,34 @@
             />
           </svg>
         </button>
-        <a href="https://flowbite.com" class="flex ms-2 md:me-24">
+        
+        <!-- Logo: se oculta en pantallas medianas y pequeñas -->
+        <figure class="hidden md:flex">
           <img
-            src="https://flowbite.com/docs/images/logo.svg"
-            class="h-6 me-3"
-            alt="FlowBite Logo"
+            src="./assets/img/logo-alquilaYa.svg"
+            class="h-8"
+            alt="Logo de alquilaYa"
           />
-          <span
-            class="self-center text-lg font-semibold whitespace-nowrap dark:text-white"
-            >Flowbite</span
-          >
-        </a>
+        </figure>
       </div>
 
-      <div class="flex items-center gap-3">
+      <!-- Buscador: con ancho controlado -->
+      <div class="relative flex-1 max-w-md lg:max-w-xl">
+        <input
+          type="search"
+          class="w-full py-3 pl-12 pr-4 text-gray-700 placeholder-gray-400 border-0 focus:ring-0 focus:ring-transparent bg-white rounded-2xl inset-shadow-xs shadow-lg text-sm md:text-base"
+          placeholder="Buscar propiedades, servicios..."
+        />
+        <button
+          type="submit"
+          class="absolute left-0 top-0 mt-3 ml-4 text-gray-400 hover:text-purple-600"
+        >
+          <i class="fas fa-search text-marca text-base"></i>
+        </button>
+      </div>
+
+      <!-- Sección derecha: Theme toggle + User -->
+      <div class="flex items-center gap-2 shrink-0">
         <button
           id="theme-toggle"
           type="button"
@@ -74,31 +88,30 @@
           </svg>
         </button>
 
-        <div class="flex items-center ms-3">
-          <div>
-            <button
-              type="button"
-              class="flex text-sm bg-gray-800 rounded-full focus:ring-4 focus:ring-gray-300 dark:focus:ring-gray-600"
-              aria-expanded="false"
-              data-dropdown-toggle="dropdown-user"
-            >
-              <span class="sr-only">Open user menu</span>
-              <img
-                class="w-8 h-8 rounded-full"
-                src="https://flowbite.com/docs/images/people/profile-picture-5.jpg"
-                alt="user photo"
-              />
-            </button>
-          </div>
+        <div class="flex items-center">
+          <button
+            type="button"
+            class="flex text-sm bg-gray-800 rounded-full focus:ring-4 focus:ring-gray-300 dark:focus:ring-gray-600"
+            aria-expanded="false"
+            data-dropdown-toggle="dropdown-user"
+          >
+            <span class="sr-only">Open user menu</span>
+            <img
+              class="w-8 h-8 rounded-full"
+              src="https://flowbite.com/docs/images/people/profile-picture-5.jpg"
+              alt="user photo"
+            />
+          </button>
+          
           <div
             class="z-50 hidden bg-neutral-primary-medium border border-default-medium rounded-base shadow-lg w-44"
             id="dropdown-user"
           >
             <div class="px-4 py-3 border-b border-default-medium" role="none">
               <p class="text-sm font-medium text-heading" role="none">
-                Neil Sims
+                Miguel Dolic
               </p>
-              <p class="text-sm text-body truncate" role="none">miguelon</p>
+              <p class="text-sm text-body truncate" role="none">mdolicg</p>
             </div>
             <ul class="p-2 text-sm text-body font-medium" role="none">
               <li>
@@ -106,32 +119,34 @@
                   href="#"
                   class="inline-flex items-center w-full p-2 hover:bg-neutral-tertiary-medium hover:text-heading rounded"
                   role="menuitem"
-                  >Dashboard</a
                 >
+                  <lucide-icon [img]="User" [size]="18"></lucide-icon>
+                  <span class="flex-1 ms-3 whitespace-nowrap">Perfil</span>
+                </a>
               </li>
-              <li>
+              <li class="border-b border-default-medium">
                 <a
                   href="#"
                   class="inline-flex items-center w-full p-2 hover:bg-neutral-tertiary-medium hover:text-heading rounded"
                   role="menuitem"
-                  >Settings</a
                 >
+                  <lucide-icon [img]="Cog" [size]="18"></lucide-icon>
+                  <span class="flex-1 ms-3 whitespace-nowrap"
+                    >Configuración</span
+                  >
+                </a>
               </li>
               <li>
                 <a
                   href="#"
-                  class="inline-flex items-center w-full p-2 hover:bg-neutral-tertiary-medium hover:text-heading rounded"
+                  class="flex items-center text-red-600 w-full p-2 hover:bg-neutral-tertiary-medium hover:text-red-600 rounded group"
                   role="menuitem"
-                  >Earnings</a
                 >
-              </li>
-              <li>
-                <a
-                  href="#"
-                  class="inline-flex items-center w-full p-2 hover:bg-neutral-tertiary-medium hover:text-heading rounded"
-                  role="menuitem"
-                  >Sign out</a
-                >
+                  <lucide-icon [img]="DoorOpen" [size]="18"></lucide-icon>
+                  <span class="flex-1 ms-3 whitespace-nowrap"
+                    >Cerrar Sesión</span
+                  >
+                </a>
               </li>
             </ul>
           </div>

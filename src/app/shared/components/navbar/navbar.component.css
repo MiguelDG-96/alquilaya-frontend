@@ -1,0 +1,29 @@
+/* Animaciones y estilos adicionales */
+.transition-transform {
+  transition-property: transform;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.duration-300 {
+  transition-duration: 300ms;
+}
+
+.ease-out {
+  transition-timing-function: cubic-bezier(0, 0, 0.2, 1);
+}
+
+/* Asegurar que el overlay esté encima del contenido pero debajo del menú */
+.fixed.inset-0.z-30 {
+  z-index: 30;
+}
+
+.fixed.inset-0.z-35 {
+  z-index: 35;
+}
+
+/* Estilos para el input de búsqueda responsive */
+@media (max-width: 640px) {
+  input::placeholder {
+    font-size: 0.875rem;
+  }
+}

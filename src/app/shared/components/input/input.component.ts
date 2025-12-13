@@ -6,27 +6,7 @@ import { CommonModule } from '@angular/common'; // Usamos CommonModule para @if 
   selector: 'app-input',
   standalone: true,
   imports: [ReactiveFormsModule, CommonModule], 
-  // Estilos agregados para eliminar artefactos visuales de corchetes/bordes no deseados
-  styles: [`
-    :host {
-      /* Asegura que el contenedor del componente no tenga bordes o outlines */
-      border: none !important;
-      outline: none !important;
-      box-shadow: none !important;
-      display: block; 
-    }
-    
-    .relative.flex.items-center {
-      border: none !important;
-      outline: none !important;
-      box-shadow: none !important;
-    }
-    
-    .w-full:focus {
-      outline: none;
-      box-shadow: 0 0 0 2px rgba(102, 35, 128, 0.5); /* Sombra de foco púrpura sutil */
-    }
-  `],
+  styleUrls: ['input.component.css'],
   template: `
     <div class="relative">
       <div class="relative flex items-center">
